@@ -63,19 +63,13 @@ st.header("Data Taken for Analysis")
 inputdata=pd.read_csv("UserInputData.csv")
 st.dataframe(inputdata.head())
 st.subheader("Enter Below Details..")
-def get_unique_values(column):
-    options=inputdata[column].unique().tolist()
-    options.sort()
-    options.insert(0,"--Select--")
-    return options
 col1, col2, col3 = st.columns(3)
-
 with col1:
-    Category = st.selectbox("Category", get_unique_values("Category"))
+    Category = st.selectbox("Category", np.sort(inputdata["Category"].unique()), index=None, placeholder="--Select--")
 with col2:
-    CR = st.selectbox("Content Rating", get_unique_values("Content Rating"))
+    CR = st.selectbox("Content Rating", np.sort(inputdata[inputdata["Category"]==Category]["Content Rating"].unique()), index=None, placeholder="--Select--")
 with col3: 
-    MA = st.selectbox("Minimum Android Version required", get_unique_values("Minimum Android"))
+    MA = st.selectbox("Minimum Android Version required", np.sort(inputdata[(inputdata["Category"]==Category)&(inputdata["Content Rating"]==CR)]["Minimum Android"].unique()), index=None, placeholder="--Select--")
 raw_input = inputdata[(inputdata.Category == Category) & (inputdata["Content Rating"] == CR) & 
                     (inputdata["Minimum Android"]==MA)].drop('Maximum Installs', axis=1).reset_index(drop=True)
 if st.button("Estimate Installs"):
@@ -89,4 +83,3 @@ if st.button("Estimate Installs"):
     st.write("Predicted Results are...")
     st.dataframe(raw_input.sort_values(by="Maximum Installs",ascending=False).reset_index(drop=True).head())
     st.write("Thank You")
-    
